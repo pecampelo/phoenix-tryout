@@ -1,0 +1,68 @@
+<%= if @live_action == :create do %>
+  <h2 class="mb-6">User Creation</h2>
+  <hr/>
+<% end %>
+
+<%= if @live_action == :update do %>
+  <h2 class="mb-6">User Update</h2>
+  <hr/>
+<% end %>
+
+<%= if @users |> length() > 0 do %>
+  <%= for user <- @users do %>
+    <div class="my-2 gap-x-4 flex flex-row justify-between items-center">
+      <div>
+        <div>
+          ID: <%= user.id %> 
+        </div>
+
+        <div>
+          Name: <%= user.name %> 
+        </div>
+
+        <div>
+          Email: <%= user.email %> 
+        </div>
+      </div>
+      <div>
+        <.button>
+          <.link patch={"/update?id=#{user.id}"} replace={true}>Update User</.link>
+        </.button>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <div class="mt-6">
+    No user has been created!
+  </div>
+<% end %>
+
+<%= if @live_action == :create do %>
+  <.simple_form for={@form} phx-change="validate_new_user" phx-submit="create">
+    <.input field={@form[:name]}/>
+    <.input field={@form[:email]}/>
+    <.button disabled={@valid_form == false} class="disabled:pointer-events-none disabled:opacity-50 !mt-10">
+      Create user
+    </.button>
+  </.simple_form>
+<% end %>
+
+<%= if @live_action == :update do %>
+  <%= if @editable_user != nil do %>
+    <.simple_form for={@form} phx-change="validate_user_update" phx-submit="update">
+      <.input field={@form[:name]}/>
+      <.input field={@form[:email]}/>
+      <.button disabled={@valid_form == false} class="!mt-10">
+        Update user
+      </.button>
+    </.simple_form>
+  <% end %>
+<% end %>
+
+<%= if @live_action != :create do%>
+  <div class="mt-10">
+    <.button>
+      <.link patch={"/create"} replace={true}>Create User</.link>
+    </.button>
+  </div>
+<% end %>
