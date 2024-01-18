@@ -1,20 +1,11 @@
 # Console
 
-To start your Phoenix server:
+This is an exercise to work out how the new `Phoenix.HTML.Form.to_form/1` function works and how one can use changesets to make current Phoenix 1.7 forms.
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+To start this single-shot tryout server:
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
-# phoenix-tryout
-# phoenix-tryout
+* Run `mix deps.get && mix deps.compile` to install and setup dependencies.
+* Start Phoenix endpoint with `mix phx.server` and visit [`localhost:4000`](http://localhost:4000) on your browser.
+* Example below:<br><br>
+  
+<img src="./example.gif" width="750" height="750"/>
