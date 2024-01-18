@@ -38,9 +38,9 @@
 <% end %>
 
 <%= if @live_action == :create do %>
-  <.simple_form for={@form} phx-change="validate_new_user" phx-submit="create">
+  <.simple_form for={@form} phx-change="validate_new_user" phx-submit="create" class={if @blocked_form, do: "pointer-events-none opacity-50", else: ""}>
     <.input field={@form[:name]}/>
-    <.input field={@form[:email]}/>
+    <.input field={@form[:email]} phx-keydown="validate_email" phx-blur="validate_email"/>
     <.button disabled={@valid_form == false} class="disabled:pointer-events-none disabled:opacity-50 !mt-10">
       Create user
     </.button>
@@ -49,9 +49,9 @@
 
 <%= if @live_action == :update do %>
   <%= if @editable_user != nil do %>
-    <.simple_form for={@form} phx-change="validate_user_update" phx-submit="update">
+    <.simple_form for={@form} phx-change="validate_user_update" phx-submit="update" class={if @blocked_form, do: "pointer-events-none opacity-50", else: ""}>
       <.input field={@form[:name]}/>
-      <.input field={@form[:email]}/>
+      <.input field={@form[:email]} phx-keydown="validate_email" phx-blur="validate_email"/>
       <.button disabled={@valid_form == false} class="!mt-10">
         Update user
       </.button>

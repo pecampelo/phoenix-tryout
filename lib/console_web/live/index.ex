@@ -29,6 +29,7 @@ defmodule ConsoleWeb.Live.Index do
      |> assign(
        form: to_form(params),
        valid_form: false,
+       blocked_form: false,
        valid_email: nil
      )}
   end
@@ -50,9 +51,13 @@ defmodule ConsoleWeb.Live.Index do
       else
         socket
         |> assign(:editable_user, editable_user)
+        |> assign(:valid_form, true)
+        |> assign(:form, editable_user |> Map.from_struct() |> convert_map_atoms_to_keys() |> to_form())
       end
 
-    {:noreply, socket}
+    {:noreply,
+      socket
+    }
   end
 
   @impl true
@@ -62,6 +67,41 @@ defmodule ConsoleWeb.Live.Index do
 
   @impl true
   def handle_params(_params, _url, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_info({:validate_email, value}, socket) do
+    form =
+      socket.assigns.form
+      |> Map.put("email", value)
+
+    {:noreply,
+     socket
+     |> assign(:form, form)
+     |> assign(:valid_form, Enum.empty?(form.errors))
+     |> assign(:blocked_form, false)
+    }
+  end
+
+  @impl true
+  def handle_event("validate_new_user", %{"_target" => ["email"]} = params, socket) do
+    form = validate_creation_form(params)
+
+    {:noreply,
+      socket
+      |> assign(:form, form)
+    }
+  end
+
+  @impl true
+  def handle_event("validate_email", %{"key" => key, "value" => value} = params, socket) when key in ["Tab"] do
+    Process.send_after(self(), {:validate_email, params}, 2000)
+
+    {:noreply, socket |> assign(:blocked_form, true)}
+  end
+
+  @impl true
+  def handle_event("validate_email", params, socket) do
     {:noreply, socket}
   end
 
@@ -103,7 +143,9 @@ defmodule ConsoleWeb.Live.Index do
 
     {:noreply,
      socket
-     |> assign(:users, Enum.concat(socket.assigns.users, [user]))}
+     |> assign(:users, Enum.concat(socket.assigns.users, [user]))
+     |> assign(:form, to_form(%{}))
+    }
   end
 
   @impl true
@@ -127,9 +169,7 @@ defmodule ConsoleWeb.Live.Index do
   def validate_creation_form(params) do
     params
     |> Map.delete("_target")
-    |> IO.inspect(label: "HUH??")
     |> convert_map_keys_to_atoms()
-    |> IO.inspect(label: "HUH 2??")
     |> User.changeset()
     |> Ecto.Changeset.apply_action(:validate)
     |> case do
@@ -142,7 +182,6 @@ defmodule ConsoleWeb.Live.Index do
       {:error, %Ecto.Changeset{errors: errors}} ->
         to_form(params, errors: errors)
     end
-    |> IO.inspect(label: "VALIDATE CREATION FORM")
   end
 
   def validate_update_form(user, params) do
@@ -160,7 +199,6 @@ defmodule ConsoleWeb.Live.Index do
       {:error, %Ecto.Changeset{errors: errors}} ->
         to_form(params, errors: errors)
     end
-    |> IO.inspect(label: "VALIDATE UPDATE FORM")
   end
 
   def create_user(params), do: struct(User, params)
